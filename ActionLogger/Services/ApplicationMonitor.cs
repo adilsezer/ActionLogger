@@ -6,10 +6,8 @@ namespace ActionLogger.Services
     public static class ApplicationMonitor
     {
         public static event EventHandler<ApplicationEventArgs> ApplicationStarted = delegate { };
-        public static event EventHandler<ApplicationEventArgs> ApplicationStopped = delegate { };
 
         private static ManagementEventWatcher startWatch;
-        private static ManagementEventWatcher stopWatch;
 
         public static void Start()
         {
@@ -18,12 +16,6 @@ namespace ActionLogger.Services
             startWatch = new ManagementEventWatcher(startQuery);
             startWatch.EventArrived += OnProcessStarted;
             startWatch.Start();
-
-            // Watch for process stop
-            WqlEventQuery stopQuery = new WqlEventQuery("SELECT * FROM Win32_ProcessStopTrace");
-            stopWatch = new ManagementEventWatcher(stopQuery);
-            stopWatch.EventArrived += OnProcessStopped;
-            stopWatch.Start();
         }
 
         public static void Stop()
@@ -33,13 +25,6 @@ namespace ActionLogger.Services
                 startWatch.Stop();
                 startWatch.Dispose();
                 startWatch = null;
-            }
-
-            if (stopWatch != null)
-            {
-                stopWatch.Stop();
-                stopWatch.Dispose();
-                stopWatch = null;
             }
         }
 
@@ -51,17 +36,6 @@ namespace ActionLogger.Services
             if (IsUserProcess(processId))
             {
                 ApplicationStarted(null, new ApplicationEventArgs { ProcessName = processName });
-            }
-        }
-
-        private static void OnProcessStopped(object sender, EventArrivedEventArgs e)
-        {
-            string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
-            uint processId = (uint)e.NewEvent.Properties["ProcessID"].Value;
-
-            if (IsUserProcess(processId))
-            {
-                ApplicationStopped(null, new ApplicationEventArgs { ProcessName = processName });
             }
         }
 

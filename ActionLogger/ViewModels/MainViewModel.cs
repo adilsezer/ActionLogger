@@ -39,7 +39,6 @@ namespace ActionLogger.ViewModels
 
             // Subscribe to application events
             ApplicationMonitor.ApplicationStarted += OnApplicationStarted;
-            ApplicationMonitor.ApplicationStopped += OnApplicationStopped;
 
             // Start the hooks and monitors
             MouseHook.Start();
@@ -77,13 +76,6 @@ namespace ActionLogger.ViewModels
             string description = $"User started the application '{e.ProcessName}'.";
 
             AddUserAction("Application Launch", description);
-        }
-
-        private void OnApplicationStopped(object sender, ApplicationEventArgs e)
-        {
-            string description = $"User closed the application '{e.ProcessName}'.";
-
-            AddUserAction("Application Closure", description);
         }
 
         private void AddUserAction(string actionType, string description)
