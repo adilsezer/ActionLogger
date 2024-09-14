@@ -59,27 +59,30 @@ namespace ActionLogger.ViewModels
 
         private void OnMouseClicked(object sender, MouseEventArgs e)
         {
-            string button = e.Button == MouseButtons.Left ? "Left Click" : "Right Click";
-            string description = $"Mouse Clicked at ({e.X}, {e.Y}) - {button}";
+            string button = e.Button == MouseButtons.Left ? "left" : "right";
+            string description = $"User performed a {button} mouse click at coordinates ({e.X}, {e.Y}).";
 
             AddUserAction("Mouse Click", description);
         }
 
         private void OnKeyPressed(object sender, KeyEventArgs e)
         {
-            string description = $"Key Pressed: {e.Key}";
+            string description = $"User pressed the '{e.Key}' key.";
+
             AddUserAction("Keyboard Input", description);
         }
 
         private void OnApplicationStarted(object sender, ApplicationEventArgs e)
         {
-            string description = $"Application Started: {e.ProcessName}";
+            string description = $"User started the application '{e.ProcessName}'.";
+
             AddUserAction("Application Launch", description);
         }
 
         private void OnApplicationStopped(object sender, ApplicationEventArgs e)
         {
-            string description = $"Application Closed: {e.ProcessName}";
+            string description = $"User closed the application '{e.ProcessName}'.";
+
             AddUserAction("Application Closure", description);
         }
 
@@ -90,7 +93,7 @@ namespace ActionLogger.ViewModels
             {
                 UserActions.Insert(0, new UserAction
                 {
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     ActionType = actionType,
                     Description = description
                 });

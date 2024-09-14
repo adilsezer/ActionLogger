@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Windows.Input;
 
 namespace ActionLogger.Services
 {
@@ -35,15 +36,13 @@ namespace ActionLogger.Services
 
         private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if ((nCode >= 0 &&
-                (KeyboardMessages)wParam == KeyboardMessages.WM_KEYDOWN) ||
-                (KeyboardMessages)wParam == KeyboardMessages.WM_SYSKEYDOWN)
+            if (nCode >= 0 &&
+                ((KeyboardMessages)wParam == KeyboardMessages.WM_KEYDOWN ||
+                 (KeyboardMessages)wParam == KeyboardMessages.WM_SYSKEYDOWN))
             {
                 int vkCode = Marshal.ReadInt32(lParam);
-                KeyPressed(null, new KeyEventArgs
-                {
-                    Key = (System.Windows.Input.Key)vkCode
-                });
+                Key key = KeyInterop.KeyFromVirtualKey(vkCode);
+                KeyPressed(null, new KeyEventArgs { Key = key });
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
         }
@@ -75,6 +74,6 @@ namespace ActionLogger.Services
 
     public class KeyEventArgs : EventArgs
     {
-        public System.Windows.Input.Key Key { get; set; }
+        public Key Key { get; set; }
     }
 }

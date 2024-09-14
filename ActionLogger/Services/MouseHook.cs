@@ -35,9 +35,9 @@ namespace ActionLogger.Services
 
         private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if ((nCode >= 0 &&
-                (MouseMessages)wParam == MouseMessages.WM_LBUTTONDOWN) ||
-                (MouseMessages)wParam == MouseMessages.WM_RBUTTONDOWN)
+            if (nCode >= 0 &&
+                ((MouseMessages)wParam == MouseMessages.WM_LBUTTONDOWN ||
+                 (MouseMessages)wParam == MouseMessages.WM_RBUTTONDOWN))
             {
                 MSLLHOOKSTRUCT hookStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
                 MouseClicked(null, new MouseEventArgs
