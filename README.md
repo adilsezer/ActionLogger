@@ -4,7 +4,6 @@
 **ActionLogger** is a Windows desktop app that monitors and logs user-initiated activities such as application launches, file access, mouse clicks, and keyboard inputs. It’s ideal for tracking productivity and refining RPA project details.
 
 ![Alt text](https://github.com/adilsezer/ActionLogger/blob/master/ActionLogger/Assets/actionlogger_screenshot.png?raw=true "ActionLogger App")
-![ActionLogger Screenshot](Assets/actionlogger_screenshot.png)
 
 ## Features
 
