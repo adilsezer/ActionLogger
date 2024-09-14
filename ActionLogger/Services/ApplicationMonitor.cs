@@ -1,5 +1,8 @@
 ﻿using System;
-using System.Management;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace ActionLogger.Services
 {
@@ -7,75 +10,49 @@ namespace ActionLogger.Services
     {
         public static event EventHandler<ApplicationEventArgs> ApplicationStarted = delegate { };
 
-        private static ManagementEventWatcher startWatch;
-
         public static void Start()
         {
-            // Watch for process start
-            WqlEventQuery startQuery = new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace");
-            startWatch = new ManagementEventWatcher(startQuery);
-            startWatch.EventArrived += OnProcessStarted;
-            startWatch.Start();
+            // Use DispatcherTimer to ensure STA thread compliance
+            DispatcherTimer timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(5) // Poll every 5 seconds
+            };
+            timer.Tick += Timer_Tick;
+            timer.Start();
         }
 
-        public static void Stop()
+        private static void Timer_Tick(object sender, EventArgs e)
         {
-            if (startWatch != null)
+            // Ensure that the GetActiveWindowTitle method runs on the UI thread
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                startWatch.Stop();
-                startWatch.Dispose();
-                startWatch = null;
-            }
-        }
-
-        private static void OnProcessStarted(object sender, EventArrivedEventArgs e)
-        {
-            string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
-            uint processId = (uint)e.NewEvent.Properties["ProcessID"].Value;
-
-            if (IsUserProcess(processId))
-            {
-                ApplicationStarted(null, new ApplicationEventArgs { ProcessName = processName });
-            }
-        }
-
-        /// <summary>
-        /// Determines if the process with the given ID is initiated by a user.
-        /// Excludes system processes.
-        /// </summary>
-        /// <param name="processId">The ID of the process.</param>
-        /// <returns>True if user-initiated, otherwise false.</returns>
-        private static bool IsUserProcess(uint processId)
-        {
-            try
-            {
-                using (var searcher = new ManagementObjectSearcher(
-                    $"SELECT * FROM Win32_Process WHERE ProcessId = {processId}"))
+                string activeAppName = GetActiveWindowTitle();
+                if (!string.IsNullOrEmpty(activeAppName))
                 {
-                    foreach (ManagementObject obj in searcher.Get())
-                    {
-                        string[] ownerInfo = new string[2];
-                        obj.InvokeMethod("GetOwner", ownerInfo);
-
-                        string user = ownerInfo[0];
-                        string domain = ownerInfo[1];
-
-                        if (!string.IsNullOrEmpty(user) &&
-                            !string.Equals(user, "SYSTEM", StringComparison.OrdinalIgnoreCase))
-                        {
-                            return true;
-                        }
-                    }
+                    ApplicationStarted(null, new ApplicationEventArgs { ProcessName = activeAppName });
                 }
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions if necessary
-                Console.WriteLine($"Error determining process owner: {ex.Message}");
-            }
-
-            return false;
+            });
         }
+
+        // Change this method to public so it can be accessed in MainViewModel
+        public static string GetActiveWindowTitle()
+        {
+            const int nChars = 256;
+            StringBuilder Buff = new StringBuilder(nChars);
+            IntPtr handle = GetForegroundWindow();
+
+            if (GetWindowText(handle, Buff, nChars) > 0)
+            {
+                return Buff.ToString();
+            }
+            return null;
+        }
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
     }
 
     public class ApplicationEventArgs : EventArgs

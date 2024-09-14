@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>ActionLoggerIcon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -57,6 +60,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Services\ApplicationMonitor.cs" />
+    <Compile Include="Services\ClipboardMonitor.cs" />
+    <Compile Include="Services\FileMonitor.cs" />
     <Compile Include="Services\KeyboardHook.cs" />
     <Compile Include="Services\MouseHook.cs" />
     <Compile Include="Utilities\RelayCommand.cs" />
@@ -103,6 +108,8 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="ActionLoggerIcon.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
