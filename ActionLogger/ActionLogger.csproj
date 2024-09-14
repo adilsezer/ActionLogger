@@ -111,5 +111,9 @@
   <ItemGroup>
     <Resource Include="ActionLoggerIcon.ico" />
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Assets\actionlogger_screenshot.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
