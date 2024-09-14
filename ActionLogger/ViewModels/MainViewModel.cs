@@ -17,11 +17,11 @@ namespace ActionLogger.ViewModels
         public ICollectionView UserActionsView { get; private set; }
 
         private string _filterText;
-        private string _currentActiveWindow = string.Empty; // To track active window
-        private readonly StringBuilder _typedBuffer = new StringBuilder(); // To store typed words
-        private readonly DispatcherTimer _typingTimer; // Timer for typing delay
+        private string _currentActiveWindow = string.Empty;
+        private readonly StringBuilder _typedBuffer = new StringBuilder();
+        private readonly DispatcherTimer _typingTimer;
         private DateTime _lastKeyPressTime;
-        private bool _isShiftPressed = false; // Track if Shift is pressed
+        private bool _isShiftPressed = false;
 
         public string FilterText
         {
@@ -39,29 +39,18 @@ namespace ActionLogger.ViewModels
             UserActions = new ObservableCollection<UserAction>();
             UserActionsView = CollectionViewSource.GetDefaultView(UserActions);
 
-            // Subscribe to file access events
             FileMonitor.FileAccessed += OnFileAccessed;
-
-            // Subscribe to clipboard change events
             ClipboardMonitor.ClipboardChanged += OnClipboardChanged;
-
-            // Subscribe to mouse events
             MouseHook.MouseClicked += OnMouseClicked;
-
-            // Subscribe to keyboard events
             KeyboardHook.KeyPressed += OnKeyPressed;
-
-            // Subscribe to application events
             ApplicationMonitor.ApplicationStarted += OnApplicationStarted;
 
-            // Start monitoring files, clipboard, and user interactions
             FileMonitor.StartMonitoring(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
             ClipboardMonitor.StartMonitoring();
             MouseHook.Start();
             KeyboardHook.Start();
             ApplicationMonitor.Start();
 
-            // Initialize typing timer
             _typingTimer = new DispatcherTimer();
             _typingTimer.Interval = TimeSpan.FromSeconds(2); // 2 second delay for grouping keystrokes
             _typingTimer.Tick += OnTypingTimerElapsed;
@@ -79,12 +68,12 @@ namespace ActionLogger.ViewModels
 
         private void OnFileAccessed(object sender, FileEventArgs e)
         {
-            AddUserAction("File Access", e.Action); // Already formatted in FileMonitor
+            AddUserAction("File Access", e.Action);
         }
 
         private void OnClipboardChanged(object sender, ClipboardEventArgs e)
         {
-            AddUserAction("Clipboard", e.ClipboardContent); // Already formatted in ClipboardMonitor
+            AddUserAction("Clipboard", e.ClipboardContent);
         }
 
         private void OnMouseClicked(object sender, ActionLogger.Services.MouseEventArgs e)
@@ -101,43 +90,36 @@ namespace ActionLogger.ViewModels
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
                 _isShiftPressed = true;
-                return; // Do not log the Shift key itself
+                return;
             }
 
             if (e.Key == Key.CapsLock)
             {
-                // Toggle CapsLock effect but don't log it as part of the word
                 return;
             }
 
-            // Detect if the key is a control key (e.g., Enter, Backspace)
             if (IsControlKey(e.Key))
             {
                 LogControlKey(e.Key);
             }
             else
             {
-                // If Shift is pressed, capitalize the letter but avoid logging "Capital"
                 string keyString = _isShiftPressed ? e.Key.ToString().ToUpper() : e.Key.ToString().ToLower();
 
-                // Append the character to the buffer
                 _typedBuffer.Append(keyString);
                 _lastKeyPressTime = DateTime.Now;
 
-                // Start the typing timer if not already running
                 if (!_typingTimer.IsEnabled)
                 {
                     _typingTimer.Start();
                 }
             }
 
-            // Reset Shift flag
             _isShiftPressed = false;
         }
 
         private bool IsControlKey(Key key)
         {
-            // Identify control keys (like Enter, Shift, Backspace, etc.)
             return key == Key.Return || key == Key.Back || key == Key.LeftShift || key == Key.RightShift ||
                    key == Key.LeftCtrl || key == Key.RightCtrl || key == Key.Tab || key == Key.Space;
         }
@@ -180,16 +162,15 @@ namespace ActionLogger.ViewModels
                     string description = $"You typed the word '{typedWord}' in the '{activeWindow}' window.";
 
                     AddUserAction("Keyboard Input", description);
-                    _typedBuffer.Clear(); // Clear the buffer
+                    _typedBuffer.Clear();
                 }
 
-                _typingTimer.Stop(); // Stop the timer
+                _typingTimer.Stop();
             }
         }
 
         private void OnApplicationStarted(object sender, ApplicationEventArgs e)
         {
-            // Log only if the active window has changed
             if (_currentActiveWindow != e.ProcessName)
             {
                 string description = $"You started working in the application '{e.ProcessName}', used for {GetApplicationPurpose(e.ProcessName)}.";
@@ -200,7 +181,6 @@ namespace ActionLogger.ViewModels
 
         private void AddUserAction(string actionType, string description)
         {
-            // Ensure thread-safe addition to the ObservableCollection
             Application.Current.Dispatcher.Invoke(() =>
             {
                 UserActions.Insert(0, new UserAction

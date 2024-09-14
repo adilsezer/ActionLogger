@@ -13,10 +13,9 @@ namespace ActionLogger.Services
 
         public static void StartMonitoring()
         {
-            // Use DispatcherTimer to ensure STA thread compliance and reduce performance impact
             DispatcherTimer timer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(5) // Adjust polling interval for better performance
+                Interval = TimeSpan.FromSeconds(5)
             };
             timer.Tick += Timer_Tick;
             timer.Start();
@@ -24,7 +23,6 @@ namespace ActionLogger.Services
 
         private static void Timer_Tick(object sender, EventArgs e)
         {
-            // Ensure that clipboard access is on the UI thread (STA)
             Application.Current.Dispatcher.Invoke(() =>
             {
                 try
@@ -48,7 +46,6 @@ namespace ActionLogger.Services
                 }
                 catch (Exception ex)
                 {
-                    // Handle exceptions (like access violations) gracefully without freezing the app
                     Console.WriteLine($"Clipboard access error: {ex.Message}");
                 }
             });

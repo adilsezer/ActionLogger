@@ -12,10 +12,9 @@ namespace ActionLogger.Services
 
         public static void Start()
         {
-            // Use DispatcherTimer to ensure STA thread compliance
             DispatcherTimer timer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(5) // Poll every 5 seconds
+                Interval = TimeSpan.FromSeconds(5)
             };
             timer.Tick += Timer_Tick;
             timer.Start();
@@ -23,7 +22,6 @@ namespace ActionLogger.Services
 
         private static void Timer_Tick(object sender, EventArgs e)
         {
-            // Ensure that the GetActiveWindowTitle method runs on the UI thread
             Application.Current.Dispatcher.Invoke(() =>
             {
                 string activeAppName = GetActiveWindowTitle();
@@ -34,7 +32,6 @@ namespace ActionLogger.Services
             });
         }
 
-        // Change this method to public so it can be accessed in MainViewModel
         public static string GetActiveWindowTitle()
         {
             const int nChars = 256;

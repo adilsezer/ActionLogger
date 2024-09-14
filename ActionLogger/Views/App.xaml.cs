@@ -9,7 +9,6 @@ namespace ActionLogger
         {
             base.OnStartup(e);
 
-            // Manually create and show MainWindow
             MainWindow mainWindow = new MainWindow();
             mainWindow.Show();
         }

@@ -53,7 +53,6 @@ namespace ActionLogger.Services
         {
             WM_KEYDOWN = 0x0100,
             WM_SYSKEYDOWN = 0x0104,
-            // Add other keyboard messages if needed
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]

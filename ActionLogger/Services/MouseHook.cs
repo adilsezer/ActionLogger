@@ -56,7 +56,6 @@ namespace ActionLogger.Services
         {
             WM_LBUTTONDOWN = 0x0201,
             WM_RBUTTONDOWN = 0x0204,
-            // Add other mouse messages if needed
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -96,7 +95,6 @@ namespace ActionLogger.Services
     {
         Left = 0x0201,
         Right = 0x0204
-        // Add other buttons if needed
     }
 
     public class MouseEventArgs : EventArgs
