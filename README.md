@@ -31,4 +31,4 @@
 
 ## License
 
-Licensed under the [MIT License](LICENSE).
+Licensed under the [MIT License](https://github.com/adilsezer/ActionLogger/blob/master/LICENSE.txt).
