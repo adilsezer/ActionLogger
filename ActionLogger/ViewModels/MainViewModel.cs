@@ -38,6 +38,7 @@ namespace ActionLogger.ViewModels
         {
             UserActions = new ObservableCollection<UserAction>();
             UserActionsView = CollectionViewSource.GetDefaultView(UserActions);
+            UserActionsView.Filter = FilterActions;
 
             FileMonitor.FileAccessed += OnFileAccessed;
             ClipboardMonitor.ClipboardChanged += OnClipboardChanged;
